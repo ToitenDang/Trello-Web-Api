@@ -18,8 +18,14 @@ const createNew = async(req, res, next) => {
 
 
     // title có kiểu chuỗi, bắt buộc có ít nhất 3 và nhiều nhất 50 ký tự, xóa khoảng trống hai đầu
-    title: Joi.string().required().min(3).max(50).trim().strict(),
-    description: Joi.string().required().min(3).max(256).trim().strict(),
+    title: Joi.string().required().min(3).max(50).trim().strict().message({
+      'any.required': 'Title is required (Dang)',
+      'string.empty': 'Title is not allowed to be empty (Dang)',
+      'string.min': 'Title length must be at least 3 characters long (Dang)',
+      'string.max': 'Title length must be less than or equal to 5 character long (Dang)',
+      'string.trim': 'Title must not have leading or trailing whitespace (Dang)'
+    }),
+    description: Joi.string().required().min(3).max(256).trim().strict()
   })
 
   try {

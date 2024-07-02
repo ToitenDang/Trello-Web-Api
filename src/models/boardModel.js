@@ -73,7 +73,7 @@ const getDetails = async (id) => {
         as: 'cards'// Đứng từ board qua bên collection card tìm tất cả những card có boardId của board đang đứng để lấy tất cả hiển thị ra board
       } }
     ]).toArray()
-    return result[0] || {}
+    return result[0] || null
   } catch (error) {throw new Error(error)}
 }
 

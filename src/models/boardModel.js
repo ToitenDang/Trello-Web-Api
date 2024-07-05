@@ -1,11 +1,6 @@
-/**
- * Updated by trungquandev.com's author on August 17 2023
- * YouTube: https://youtube.com/@trungquandev
- * "A bit of fragrance clings to the hand that gives flowers!"
- */
 
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { BOARD_TYPES } from '~/utils/constants'
@@ -36,16 +31,13 @@ const validateBeforeCreate = async (data) => {
 const createNew = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
-    // const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(data)
-    // return createdBoard
-    // Có thể trả thẳng về trực tiếp không cần tạo biến
-    return await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+    return createdBoard
   } catch (error) {throw new Error(error)}
 }
 
 const findOneById = async (id) => {
   try {
-    console.log(id)
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
     return result
   } catch (error) {throw new Error(error)}
@@ -76,11 +68,23 @@ const getDetails = async (id) => {
     return result[0] || null
   } catch (error) {throw new Error(error)}
 }
+// Nhiệm vụ của functin này là push 1 giá trị columnId vào cuối mảng columnOrderIds
+const pushColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      { $push: { columnOrderIds: new ObjectId(column._id) } },
+      { ReturnDocument: 'after' }// Trả về bản ghi đã cập nhật nếu không có sẽ lấy bản ghi chưa được cập nhật
+    )
+    return result.value
+  } catch (error) {throw new Error(error)}
+}
 
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  getDetails
+  getDetails,
+  pushColumnOrderIds
 }

@@ -51,7 +51,7 @@ const pushCardOrderIds = async (card) => {
       { $push: { cardOrderIds: new ObjectId(card._id) } },
       { ReturnDocument: 'after' }// Trả về bản ghi đã cập nhật nếu không có sẽ lấy bản ghi chưa được cập nhật
     )
-    return result.value
+    return result
   } catch (error) {throw new Error(error)}
 }
 

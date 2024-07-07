@@ -24,6 +24,8 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)// Khi người dùng xóa board ta chỉ gán cho nó là true và ẩn ở giao diện người dùng chứ không xóa hoàn toàn
 })
 
+const INVALID_UPDATE_FIELDS = ['_id', 'createAt']
+
 const validateBeforeCreate = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
@@ -76,7 +78,24 @@ const pushColumnOrderIds = async (column) => {
       { $push: { columnOrderIds: new ObjectId(column._id) } },
       { ReturnDocument: 'after' }// Trả về bản ghi đã cập nhật nếu không có sẽ lấy bản ghi chưa được cập nhật
     )
-    return result.value
+    return result
+  } catch (error) {throw new Error(error)}
+}
+
+const update = async (boardId, updateData) => {
+  try {
+    // Lọc những dữ liệu không cho cho phép cập nhật
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(boardId) },
+      { $set: updateData },
+      { ReturnDocument: 'after' }// Trả về bản ghi đã cập nhật nếu không có sẽ lấy bản ghi chưa được cập nhật
+    )
+    return result
   } catch (error) {throw new Error(error)}
 }
 
@@ -86,5 +105,6 @@ export const boardModel = {
   createNew,
   findOneById,
   getDetails,
-  pushColumnOrderIds
+  pushColumnOrderIds,
+  update
 }

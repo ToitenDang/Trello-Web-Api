@@ -61,7 +61,7 @@ const update = async (boardId, reqBody) => {
       updateAt: Date.now()
     }
     const updatedBoard = await boardModel.update(boardId, updateData)
-    
+
     return updatedBoard
   } catch (error) { throw error }
 }

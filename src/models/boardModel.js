@@ -24,6 +24,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)// Khi người dùng xóa board ta chỉ gán cho nó là true và ẩn ở giao diện người dùng chứ không xóa hoàn toàn
 })
 
+// Chỉ định ra những Fields mà chúng ta không muốn cho phép cập nhật
 const INVALID_UPDATE_FIELDS = ['_id', 'createAt']
 
 const validateBeforeCreate = async (data) => {

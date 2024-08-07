@@ -39,9 +39,9 @@ const createNew = async (data) => {
   } catch (error) {throw new Error(error)}
 }
 
-const findOneById = async (id) => {
+const findOneById = async (boardId) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(boardId) })
     return result
   } catch (error) {throw new Error(error)}
 }
@@ -83,6 +83,19 @@ const pushColumnOrderIds = async (column) => {
   } catch (error) {throw new Error(error)}
 }
 
+// Lấy 1 phần tử columnId ra khoir mảng columnOrderIds
+// Dùng $pull trong mongoDB ở trường hợp này để lấy một phần tử ra khỏi mảng rồi xóa đi
+const pullColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      { $pull: { columnOrderIds: new ObjectId(column._id) } },
+      { ReturnDocument: 'after' }// Trả về bản ghi đã cập nhật nếu không có sẽ lấy bản ghi chưa được cập nhật
+    )
+    return result
+  } catch (error) {throw new Error(error)}
+}
+
 const update = async (boardId, updateData) => {
   try {
     // Lọc những dữ liệu không cho cho phép cập nhật
@@ -111,5 +124,6 @@ export const boardModel = {
   findOneById,
   getDetails,
   pushColumnOrderIds,
+  pullColumnOrderIds,
   update
 }
